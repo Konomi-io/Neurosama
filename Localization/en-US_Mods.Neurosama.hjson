@@ -325,3 +325,15 @@ Emotes: {
 }
 
 UI.ToggleOutfit: Toggle Outfit
+
+Configs: {
+	NeurosamaConfig: {
+		DisplayName: Neurosama Client Config
+		Headers.Audio: Audio
+
+		EmoteSoundsToggle: {
+			Label: Emote Sounds
+			Tooltip: ""
+		}
+	}
+}

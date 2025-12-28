@@ -5,6 +5,7 @@ using Terraria.Audio;
 using Terraria.ModLoader;
 using Neurosama.Content.EmoteBubbles;
 using Neurosama.Content.NPCs.Town;
+using Neurosama.Common.Configs;
 
 public class EmoteSounds : GlobalEmoteBubble
 {
@@ -13,6 +14,8 @@ public class EmoteSounds : GlobalEmoteBubble
         if (Main.netMode == NetmodeID.Server)
             return;
 
+        if (ModContent.GetInstance<NeurosamaConfig>().EmoteSoundsToggle == false)
+            return;
         // add modded emote sounds here
         // Options: "Neuro", "Evil", "Twins", "TwinsAndPlayer"
         PlayModEmoteSound<NeweroEmote>(bubble, "fx_groantube", "Twins");
@@ -30,7 +33,8 @@ public class EmoteSounds : GlobalEmoteBubble
         PlayModEmoteSound<SmileEmote>(bubble, "evil_smile", "Evil");
         PlayModEmoteSound<SmileEmote>(bubble, "neuro_smile", "Neuro");
 
-        //focus placeholder
+        PlayModEmoteSound<FocusEmote>(bubble, "evil_focus!!", "Evil");
+        PlayModEmoteSound<FocusEmote>(bubble, "neuro_hmm!", "Neuro");
 
         // add vanilla emote sounds here
         PlayVanillaEmoteSound(134, bubble, "fx_wompwompwomp", "Twins"); //sad
