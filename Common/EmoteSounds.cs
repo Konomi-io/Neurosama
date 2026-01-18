@@ -34,14 +34,14 @@ namespace Neurosama.Common
             if (ModContent.GetInstance<NeurosamaConfig>().EmoteSFXToggle)
             {
                 PlayEmoteSound(ModContent.EmoteBubbleType<NeweroEmote>(), bubble, "SFX/groantube", EmoteOrigin.Twins);
-                PlayEmoteSound(ModContent.EmoteBubbleType<NewlivEmote>(), bubble, "SFX/metalpipe", EmoteOrigin.Evil); //temporary until pipes emote is drawn  
+                PlayEmoteSound(ModContent.EmoteBubbleType<PipesEmote>(), bubble, "SFX/metalpipe", EmoteOrigin.Evil);
                 PlayEmoteSound(EmoteID.EmoteSadness, bubble, "SFX/wompwompwomp", EmoteOrigin.Twins);
                 PlayEmoteSound(EmoteID.EmoteSilly, bubble, "SFX/clownhorn", EmoteOrigin.Twins);
                 PlayEmoteSound(EmoteID.DebuffCurse, bubble, "SFX/incorrectbuzzer", EmoteOrigin.Twins);
                 PlayEmoteSound(EmoteID.EmoteNote, bubble, "SFX/correctbuzzer", EmoteOrigin.Twins);
                 PlayEmoteSound(EmoteID.ItemDynamite, bubble, "SFX/vineboom", EmoteOrigin.Twins);
                 PlayEmoteSound(EmoteID.DebuffSilence, bubble, "SFX/awkwardcrickets", EmoteOrigin.Twins);
-                PlayEmoteSound(EmoteID.EmoteKiss, bubble, "SFX/rizz", EmoteOrigin.Twins); // temporary until rizz emote is drawn (will not be used currently because not in default emote pool)  
+                PlayEmoteSound(ModContent.EmoteBubbleType<NeurizzEmote>(), bubble, "SFX/rizz", EmoteOrigin.Twins);
                 PlayEmoteSound(EmoteID.EmoteFear, bubble, "SFX/scaryviolin", EmoteOrigin.Twins);
                 //PlayEmoteSound(EmoteID.ItemSword, bubble, "SFX/poke", EmoteOrigin.Twins);   
                 PlayEmoteSound(EmoteID.CritterSlime, bubble, "SFX/sus", EmoteOrigin.Twins); //(it looks like the visor of the crewmate trust)  

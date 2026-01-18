@@ -331,6 +331,8 @@ namespace Neurosama.Content.NPCs.Town
         }*/
 
         public override int? PickEmote(Player closestPlayer, List<int> emoteList, WorldUIAnchor otherAnchor) {
+            emoteList.Add(ModContent.EmoteBubbleType<NeurizzEmote>());
+
             emoteList.Add(ModContent.EmoteBubbleType<ErmEmote>());
 
             emoteList.Add(ModContent.EmoteBubbleType<HeartEmote>());
