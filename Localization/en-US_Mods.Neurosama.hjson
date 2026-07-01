@@ -174,6 +174,24 @@ Items: {
 		DisplayName: Neuro Lava Lamp
 		Tooltip: "'NEUROSAMA BRANDED ?!'"
 	}
+
+	Neuro21MusicBox: {
+		DisplayName: Music Box (Neuro 21 Station)
+		Tooltip:
+			'''
+			'A dedicated radio broadcasting all Neuro and Evil karaoke covers 24/7.'
+			Requires internet connection
+			'''
+	}
+
+	TruckersFMMusicBox: {
+		DisplayName: Music Box (TruckersFM)
+		Tooltip:
+			'''
+			'I love TruckersFM'
+			Requires internet connection
+			'''
+	}
 }
 
 NPCs: {
@@ -333,11 +351,17 @@ Emotes: {
 }
 
 UI.ToggleOutfit: Toggle Outfit
+NowPlaying: Now Playing:
 
 Configs: {
 	NeurosamaConfig: {
 		DisplayName: Neuro-sama Mod Client Config
-		Headers.Audio: Audio
+
+		Headers: {
+			Audio: Audio
+			LiveRadio: Live Radio
+			LavaLamp: Lava Lamp
+		}
 
 		EmoteSoundsVolume: {
 			Label: Emote Sound Volume
@@ -352,6 +376,21 @@ Configs: {
 		EmoteVoiceToggle: {
 			Label: Emote Voiceline Sounds
 			Tooltip: Toggle whether Neuro & Evil say voicelines when using certain emotes
+		}
+
+		KeepStreamingUnfocused: {
+			Label: Keep Streaming Unfocused
+			Tooltip: Keeps music box radio streams running when out of tab
+		}
+
+		UseTestServer: {
+			Label: Use Test Server
+			Tooltip: Test your lava lamp sync outside of streams (Debug)
+		}
+
+		UseDiscoColorWhenNoNeuroStream: {
+			Label: Use Disco Color When Stream Is Offline
+			Tooltip: Uses rainbow brick color pattern while Neuro's stream (and therefore lavalamp) is offline
 		}
 	}
 }

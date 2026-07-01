@@ -19,5 +19,16 @@ namespace Neurosama.Common.Configs
 
         [DefaultValue(true)]
         public bool EmoteVoiceToggle;
+
+        [Header("LiveRadio")]
+        [DefaultValue(false)]
+        public bool KeepStreamingUnfocused;
+
+        [Header("LavaLamp")]
+        [DefaultValue(false)]
+        public bool UseTestServer;
+        [DefaultValue(false)]
+        public bool UseDiscoColorWhenNoNeuroStream;
+
     }
 }

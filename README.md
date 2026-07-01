@@ -29,13 +29,15 @@ Anyone is welcome to contribute to the mod! If you would like to participate in 
 
 ## Credits
 - Konomi (Programming)
-- Mongusaeye (Art)
+- Mongusaeye (Art, Programming)
 - Pachekin (Art, Programming)
 ### Additional Credits
 - Kaseio (Fixed some bugs)
 - owobred (Drone AI Code)
 - W1n7ner (Original creator of neuroErm)
 - Vedal (Creator of Neuro-sama and Abandoned Archive)
+- Soul (Creator of Neuro 21 Station)
+- MYFACEISAUSOME (Creator of Unofficial Lava Lamp (Swarm Sync) API)
 
 ##
 ### [Mod on the Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3617293068)
@@ -48,4 +50,4 @@ Anyone is welcome to contribute to the mod! If you would like to participate in 
 
 ## License
 All original content created for this mod is licensed under the [MIT license](https://github.com/k0nomi/Neurosama/blob/main/LICENSE).
-All third-party characters, assets, and intellectual properties (including Neuro-sama, Evil Neuro, Vedal, and Abandoned Archive) remain the property of their respective owners.
+All third-party characters, assets, and intellectual properties (including Neuro-sama, Evil Neuro, Vedal, TruckersFM, and Abandoned Archive) remain the property of their respective owners.

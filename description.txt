@@ -6,7 +6,7 @@ This is a fan made mod for the Twitch streamer Neuro-sama and her sister Evil Ne
 - Neuro, Evil and Vedal NPCs
 - All 3 official plushes
 - Ermfish critter and Ermshark enemy
-- Vanity for Neuro and Evil’s outfits
+- Vanity for Neuro and Evilï¿½s outfits
 - Abandoned Archive (Corpa)
 - Music boxes for all the Neuro & Evil originals
 - neuroErm
@@ -17,7 +17,7 @@ This is a fan made mod for the Twitch streamer Neuro-sama and her sister Evil Ne
 
 == Credits ==
 - Konomi (Programming)
-- Mongusaeye (Art)
+- Mongusaeye (Art, Programming)
 - Pachekin (Art, Programming)
 
 == Additional Credits ==
@@ -25,6 +25,8 @@ This is a fan made mod for the Twitch streamer Neuro-sama and her sister Evil Ne
 - owobred (Drone AI Code)
 - W1n7ner (Original creator of neuroErm)
 - Vedal (Creator of Neuro-sama and Abandoned Archive)
+- Soul (Creator of Neuro 21 Station)
+- MYFACEISAUSOME (Creator of Unofficial Lava Lamp (Swarm Sync) API)
 
 Check the mod's homepage for links and the source code!
 

@@ -28,13 +28,15 @@ Anyone is welcome to contribute to the mod! If you would like to participate in 
 [/list]
 [h2]Credits[/h2]
 [list][*] Konomi (Programming)
-[*] Mongusaeye (Art)
+[*] MongusaEye (Art, Programming)
 [*] Pachekin (Art, Programming)
 [/list][h3]Additional Credits[/h3]
 [list][*] Kaseio (Fixed some bugs)
 [*] owobred (Drone AI Code)
 [*] W1n7ner (Original creator of neuroErm)
 [*] Vedal (Creator of Neuro-sama and Abandoned Archive)
+[*] Soul (Creator of Neuro 21 Station)
+[*] MYFACEISAUSOME (Creator of Unofficial Lava Lamp (Swarm Sync) API)
 [/list]
 [h1]Links[/h1]
 [b][url=https://github.com/Konomi-io/Neurosama]Source Code[/url]
