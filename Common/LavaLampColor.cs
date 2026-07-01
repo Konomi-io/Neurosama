@@ -166,9 +166,14 @@ namespace Neurosama.Content
                 {
                     await ListenToSSEAsync(currentActiveUrl, token);
                 }
+                catch (HttpIOException ioEx)
+                {
+                    ModContent.GetInstance<Neurosama>().Logger.Info($"LavaLamp SSE stream reset by server (reconnecting): {ioEx.Message}");
+                    HandleFallbackTransition();
+                }
                 catch (Exception ex)
                 {
-                    ModContent.GetInstance<Neurosama>().Logger.Debug($"LavaLamp SSE disconnected: {ex.Message}");
+                    ModContent.GetInstance<Neurosama>().Logger.Debug($"LavaLamp SSE disconnected unexpectedly: {ex.Message}");
                     HandleFallbackTransition();
                 }
 
