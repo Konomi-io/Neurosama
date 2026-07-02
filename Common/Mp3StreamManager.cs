@@ -104,6 +104,29 @@ namespace Neurosama
         {
             if (IsStreaming) return;
 
+            if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+            {
+                IsStreaming = false;
+                return;
+            }
+
+            try
+            {
+                var uri = new Uri(url);
+                var addresses = System.Net.Dns.GetHostAddresses(uri.Host);
+                if (addresses == null || addresses.Length == 0)
+                {
+                    IsStreaming = false;
+                    return;
+                }
+            }
+            catch
+            {
+                // Caught offline state instantly before HttpClient or Task.
+                IsStreaming = false;
+                return;
+            }
+            
             Url = url;
             IsStreaming = true;
             _stopRequested = false;
@@ -116,18 +139,25 @@ namespace Neurosama
 
         private async Task StreamLoop(string url, CancellationToken token)
         {
+            // Scope these at the top so the finally block can see them to kill the socket
+            HttpRequestMessage request = null;
+            HttpResponseMessage response = null;
             DynamicSoundEffectInstance localInstance = null;
+
             try
             {
-                using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request = new HttpRequestMessage(HttpMethod.Get, url);
                 request.Headers.Add("Icy-MetaData", "1");
                 request.Headers.UserAgent.ParseAdd("Tmodloader-NeuroMod-MusicBox");
+
+                // Force native teardown on close
+                request.Headers.ConnectionClose = true;
 
                 // Use a linked timeout specifically for the handshake phase
                 using var handshakeCts = CancellationTokenSource.CreateLinkedTokenSource(token);
                 handshakeCts.CancelAfter(TimeSpan.FromSeconds(6));
 
-                HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, handshakeCts.Token);
+                response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, handshakeCts.Token);
                 response.EnsureSuccessStatusCode();
 
                 int metaInt = 0;
@@ -171,15 +201,22 @@ namespace Neurosama
                             break;
                         }
 
-
                         if (_audioBufferQueue.Count >= MaxQueueCapacity)
                         {
-                            await Task.Delay(40, token); // Slightly reduced backoff for better frame-pacing
+                            await Task.Delay(40, token);
                             continue;
                         }
 
-                        // Wrap the synchronous network decoding loop securely to prevent main thread stutters
-                        int samplesRead = await Task.Run(() => mpegStream.ReadSamples(sampleBuffer, 0, sampleBuffer.Length), token);
+                        int samplesRead = 0;
+                        try
+                        {
+                            samplesRead = await Task.Run(() => mpegStream.ReadSamples(sampleBuffer, 0, sampleBuffer.Length), token);
+                        }
+                        catch (IOException) when (token.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
                         if (samplesRead == 0)
                         {
                             ModContent.GetInstance<Neurosama>().Logger.Warn("Stream reached EOF. Stream stopping.");
@@ -214,7 +251,15 @@ namespace Neurosama
                     }
                 }
             }
+            catch (IOException) when (token.IsCancellationRequested)
+            {
+                return;
+            }
             catch (OperationCanceledException) { }
+            catch (HttpRequestException ex) when (ex.InnerException is System.Net.Sockets.SocketException socketEx && socketEx.ErrorCode == 11001)
+            {
+                ModContent.GetInstance<Neurosama>().Logger.Debug("Failed to connect to audio stream host. Skipping stream.");
+            }
             catch (Exception ex)
             {
                 ModContent.GetInstance<Neurosama>().Logger.Error("Audio Stream Error: ", ex);
@@ -222,6 +267,20 @@ namespace Neurosama
             finally
             {
                 _stopRequested = true;
+
+                // Safely wipe out the request state machine first to bypass DrainAsync()
+                try
+                {
+                    request?.Dispose();
+                }
+                catch { }
+
+                // Hard close the active network stream context immediately
+                try
+                {
+                    response?.Dispose();
+                }
+                catch { }
             }
         }
 

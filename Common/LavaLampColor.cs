@@ -50,6 +50,11 @@ namespace Neurosama.Content
                     : "https://api.neurolavalamp.com";
             }
         }
+        //check if connected to internet
+        private static bool IsSteamConnected =>
+            Terraria.Social.SocialAPI.Mode == Terraria.Social.SocialMode.Steam &&
+            Steamworks.SteamAPI.IsSteamRunning() &&
+            Steamworks.SteamUser.BLoggedOn();
 
         public override void OnModLoad() { }
 
@@ -155,13 +160,21 @@ namespace Neurosama.Content
             while (!token.IsCancellationRequested)
             {
                 string currentActiveUrl = BaseUrl;
-
-                if (!_isLavaLampOnScreen)
+                if (!_isLavaLampOnScreen || !IsSteamConnected)
                 {
+                    if (!IsSteamConnected && _isLavaLampOnScreen)
+                    {
+                        HandleFallbackTransition();
+                    }
                     await Task.Delay(1000, token);
                     continue;
                 }
-
+                if (!IsHostReachable(currentActiveUrl))
+                {
+                    HandleFallbackTransition();
+                    await Task.Delay(2000, token); // Wait 2 seconds before checking again
+                    continue; // Skip the rest of the loop entirely to prevent tML error intercepts
+                }
                 try
                 {
                     await ListenToSSEAsync(currentActiveUrl, token);
@@ -177,7 +190,7 @@ namespace Neurosama.Content
                     HandleFallbackTransition();
                 }
 
-                if (!token.IsCancellationRequested && _isLavaLampOnScreen)
+                if (!token.IsCancellationRequested && _isLavaLampOnScreen && IsSteamConnected)
                 {
                     await PollFallbackAsync(token);
                 }
@@ -186,45 +199,77 @@ namespace Neurosama.Content
 
         private static async Task ListenToSSEAsync(string targetUrl, CancellationToken token)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"{targetUrl}/v1/events");
-            using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
-            response.EnsureSuccessStatusCode();
+            // Scope these out so we can safely kill them in a finally block
+            HttpRequestMessage request = null;
+            HttpResponseMessage response = null;
 
-            using var stream = await response.Content.ReadAsStreamAsync(token);
-            using var reader = new StreamReader(stream, Encoding.UTF8);
-
-            StringBuilder dataBuffer = new();
-
-            while (!token.IsCancellationRequested && !reader.EndOfStream)
+            try
             {
-                if (!_isLavaLampOnScreen) break;
+                request = new HttpRequestMessage(HttpMethod.Get, $"{targetUrl}/v1/events");
 
-                if (targetUrl != BaseUrl)
+                // FORCE NATIVE TEARDOWN: Prevents .NET from holding onto the socket 
+                // in an internal pool when the internet drops or fluctuates.
+                request.Headers.ConnectionClose = true;
+
+                response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
+                response.EnsureSuccessStatusCode();
+
+                using var stream = await response.Content.ReadAsStreamAsync(token);
+                using var reader = new StreamReader(stream, Encoding.UTF8);
+
+                StringBuilder dataBuffer = new();
+
+                while (!token.IsCancellationRequested && !reader.EndOfStream)
                 {
-                    ModContent.GetInstance<Neurosama>().Logger.Info("LavaLamp config changed server target. Reconnecting...");
-                    lock (_stateLock) _lastSetUnixMs = 0;
-                    break;
-                }
+                    if (!_isLavaLampOnScreen || !IsSteamConnected) break;
 
-                string line = await reader.ReadLineAsync();
-
-                if (string.IsNullOrEmpty(line))
-                {
-                    if (dataBuffer.Length > 0)
+                    if (targetUrl != BaseUrl)
                     {
-                        ParseAndEmitState(dataBuffer.ToString());
-                        dataBuffer.Clear();
+                        ModContent.GetInstance<Neurosama>().Logger.Info("LavaLamp config changed server target. Reconnecting...");
+                        lock (_stateLock) _lastSetUnixMs = 0;
+                        break;
                     }
-                    continue;
+
+                    string line = await reader.ReadLineAsync();
+
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        if (dataBuffer.Length > 0)
+                        {
+                            ParseAndEmitState(dataBuffer.ToString());
+                            dataBuffer.Clear();
+                        }
+                        continue;
+                    }
+
+                    if (line.StartsWith(":")) continue;
+
+                    if (line.StartsWith("data:"))
+                    {
+                        string value = line.Substring(5).Trim();
+                        dataBuffer.AppendLine(value);
+                    }
                 }
-
-                if (line.StartsWith(":")) continue;
-
-                if (line.StartsWith("data:"))
+            }
+            catch (IOException) when (token.IsCancellationRequested)
+            {
+                // world exit
+                return;
+            }
+            finally
+            {
+                // dispose state machines to ensure no background threads drag out socket lifetimes
+                try
                 {
-                    string value = line.Substring(5).Trim();
-                    dataBuffer.AppendLine(value);
+                    request?.Dispose();
                 }
+                catch { }
+
+                try
+                {
+                    response?.Dispose();
+                }
+                catch { }
             }
         }
 
@@ -233,20 +278,26 @@ namespace Neurosama.Content
             ModContent.GetInstance<Neurosama>().Logger.Info("LavaLamp entering smart polling fallback mode.");
             DateTime sseRetryDeadline = DateTime.UtcNow.AddSeconds(60);
 
-            while (DateTime.UtcNow < sseRetryDeadline && !token.IsCancellationRequested && _isLavaLampOnScreen)
+            while (DateTime.UtcNow < sseRetryDeadline && !token.IsCancellationRequested && _isLavaLampOnScreen && IsSteamConnected)
             {
                 string currentPollingUrl = BaseUrl;
 
                 try
                 {
-                    if (!_isLavaLampOnScreen) return;
+                    if (!_isLavaLampOnScreen || !IsSteamConnected) return;
 
-                    // Recommended pattern update to fully leverage cancellation tokens during standard requests
                     using var response = await httpClient.GetAsync($"{currentPollingUrl}/v1/rgb", token);
                     response.EnsureSuccessStatusCode();
                     string json = await response.Content.ReadAsStringAsync(token);
 
                     ParseAndEmitState(json);
+
+                    bool liveSnapshotFallback;
+                    lock (_stateLock) liveSnapshotFallback = _isLive;
+                    if (liveSnapshotFallback)
+                    {
+                        return; // Exit PollFallback immediately to resume live SSE streaming
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -262,7 +313,7 @@ namespace Neurosama.Content
                 int elapsed = 0;
                 while (elapsed < delayMs && !token.IsCancellationRequested)
                 {
-                    if (currentPollingUrl != BaseUrl || !_isLavaLampOnScreen) return;
+                    if (currentPollingUrl != BaseUrl || !_isLavaLampOnScreen || !IsSteamConnected) return;
 
                     await Task.Delay(interval, token);
                     elapsed += interval;
@@ -312,6 +363,24 @@ namespace Neurosama.Content
             {
                 ModContent.GetInstance<Neurosama>().Logger.Debug($"LavaLamp Parse Error: {ex.Message}");
                 HandleFallbackTransition();
+            }
+        }
+        private static bool IsHostReachable(string url)
+        {
+            if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+            {
+                return false; // Exit instantly without triggering a SocketException
+            }
+            try
+            {
+                var uri = new Uri(url);
+                var addresses = System.Net.Dns.GetHostAddresses(uri.Host);
+                return addresses != null && addresses.Length > 0;
+            }
+            catch
+            {
+                // Domain cannot be found or offline state encountered
+                return false;
             }
         }
     }
