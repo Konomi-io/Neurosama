@@ -210,6 +210,7 @@ namespace Neurosama.Content
                 string request = $"GET {uri.PathAndQuery} HTTP/1.1\r\n" +
                                  $"Host: {uri.Host}\r\n" +
                                  "Accept: text/event-stream\r\n" +
+                                 $"User-Agent: NeurosamaTerrariaMod/{ModContent.GetInstance<Neurosama>().Version}\r\n" +
                                  "Connection: close\r\n\r\n";
 
                 byte[] requestBytes = Encoding.UTF8.GetBytes(request);

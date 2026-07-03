@@ -142,7 +142,7 @@ namespace Neurosama
             {
                 request = new HttpRequestMessage(HttpMethod.Get, url);
                 request.Headers.Add("Icy-MetaData", "1");
-                request.Headers.UserAgent.ParseAdd("Tmodloader-NeuroMod-MusicBox");
+                request.Headers.UserAgent.ParseAdd($"NeurosamaTerrariaMod/{ModContent.GetInstance<Neurosama>().Version}");
 
                 // Force native teardown on close
                 request.Headers.ConnectionClose = true;
