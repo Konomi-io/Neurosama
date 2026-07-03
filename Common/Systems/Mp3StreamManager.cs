@@ -22,6 +22,8 @@ namespace Neurosama
 
         public static void StartStream(string channelId, string url)
         {
+            if (Main.dedServ) return;
+
             if (!_channels.TryGetValue(channelId, out var channel))
             {
                 channel = new Mp3StreamChannel(_sharedHttpClient);
@@ -49,6 +51,8 @@ namespace Neurosama
 
         public static void PumpAudioBuffers()
         {
+            if (Main.dedServ) return;
+
             foreach (var channel in _channels.Values)
             {
                 channel.PumpAudio();
@@ -57,6 +61,8 @@ namespace Neurosama
 
         public static void UpdateMainThreadCleanup()
         {
+            if (Main.dedServ) return;
+
             foreach (var channel in _channels.Values)
             {
                 channel.UpdateCleanup();
@@ -499,17 +505,23 @@ namespace Neurosama
     {
         public override void OnWorldUnload()
         {
+            if (Main.dedServ) return;
+
             Mp3StreamManager.StopAll();
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
+            if (Main.dedServ) return;
+
             Mp3StreamManager.UpdateMainThreadCleanup();
             Mp3StreamManager.PumpAudioBuffers();
         }
 
         public override void Unload()
         {
+            if (Main.dedServ) return;
+            
             Mp3StreamManager.StopAll();
         }
     }
