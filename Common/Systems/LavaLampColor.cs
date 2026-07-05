@@ -79,10 +79,7 @@ namespace Neurosama.Content
             }
         }
 
-        private static bool IsSteamConnected =>
-            Terraria.Social.SocialAPI.Mode == Terraria.Social.SocialMode.Steam &&
-            Steamworks.SteamAPI.IsSteamRunning() &&
-            Steamworks.SteamUser.BLoggedOn();
+        private static bool IsApiConnected => IsHostReachable(BaseUrl);
 
         public override void OnModLoad() { }
 
@@ -157,9 +154,9 @@ namespace Neurosama.Content
             {
                 string currentActiveUrl = BaseUrl;
 
-                if (!IsLavaLampOnScreen || !IsSteamConnected)
+                if (!IsLavaLampOnScreen || !IsApiConnected)
                 {
-                    if (!IsSteamConnected && IsLavaLampOnScreen)
+                    if (!IsApiConnected && IsLavaLampOnScreen)
                     {
                         HandleFallbackTransition();
                     }
@@ -235,7 +232,7 @@ namespace Neurosama.Content
                 StringBuilder dataBuffer = new StringBuilder();
                 lineBuffer.Append(structuralRemainder);
 
-                while (!token.IsCancellationRequested && IsLavaLampOnScreen && IsSteamConnected)
+                while (!token.IsCancellationRequested && IsLavaLampOnScreen && IsApiConnected)
                 {
                     if (url != BaseUrl) break;
 
