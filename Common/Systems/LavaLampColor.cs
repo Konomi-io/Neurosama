@@ -170,21 +170,18 @@ namespace Neurosama.Content
             while (!token.IsCancellationRequested)
             {
                 string currentActiveUrl = BaseUrl;
+                var config = ModContent.GetInstance<NeurosamaConfig>();
 
-                if (!IsLavaLampOnScreen || !IsApiConnected)
+                if (!IsLavaLampOnScreen)
                 {
-                    if (!IsApiConnected && IsLavaLampOnScreen)
-                    {
-                        HandleFallbackTransition();
-                    }
-                    await Task.Delay(1000, token);
+                    await Task.Delay(config.LavaLampLiveLatency, token);
                     continue;
                 }
 
-                if (!IsHostReachable(currentActiveUrl))
+                if (!IsApiConnected)
                 {
                     HandleFallbackTransition();
-                    await Task.Delay(2000, token);
+                    await Task.Delay(config.LavaLampLiveLatency, token);
                     continue;
                 }
 
@@ -196,7 +193,7 @@ namespace Neurosama.Content
                     liveSnapshot = _isLive;
                 }
 
-                int delayMs = _useDiscoFallback ? 10000 : (liveSnapshot ? 1000 : 30000);
+                int delayMs = _useDiscoFallback ? 5000 : (liveSnapshot ? config.LavaLampLiveLatency : config.LavaLampOfflineLatency);
                 try
                 {
                     await Task.Delay(delayMs, token);

@@ -9,7 +9,7 @@ namespace Neurosama.Common.Configs
         RegularServer,
         CustomServer
     }
-    
+
     public class NeurosamaConfig : ModConfig
 	{
 		// ConfigScope.ClientSide should be used for client side, usually visual or audio tweaks.
@@ -44,6 +44,16 @@ namespace Neurosama.Common.Configs
 
         [DefaultValue(false)]
         public bool UseDiscoColorWhenNoNeuroStream;
+
+        [Range(100, 1000)]
+        [Increment(100)]
+        [DefaultValue(500)]
+        public int LavaLampLiveLatency { get; set; }
+
+        [Range(10000, 60000)]
+        [Increment(1000)]
+        [DefaultValue(10000)]
+        public int LavaLampOfflineLatency { get; set; }
 
     }
 }

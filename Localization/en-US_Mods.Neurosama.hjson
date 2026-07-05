@@ -402,6 +402,16 @@ Configs: {
 			Label: Custom Server Url
 			Tooltip: If custom server is selected, type the link here
 		}
+
+		LavaLampLiveLatency: {
+			Label: Lava Lamp Live Latency (ms)
+			Tooltip: How often to update lava lamp colors when Neuro is live
+		}
+
+		LavaLampOfflineLatency: {
+			Label: Lava Lamp Offline Latency (ms)
+			Tooltip: How often to check that Neuro is live
+		}
 	}
 
 	LavaLampServerTypeOptions: {
