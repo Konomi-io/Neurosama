@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Terraria;
 using Terraria.ModLoader;
 using Neurosama.Content.Tiles.Furniture;
+using Neurosama.Common.Configs;
 
 namespace Neurosama.Content
 {
@@ -55,9 +56,25 @@ namespace Neurosama.Content
             get
             {
                 var config = ModContent.GetInstance<Common.Configs.NeurosamaConfig>();
-                return config != null && config.UseTestServer
-                    ? "https://test.neurolavalamp.com"
-                    : "https://api.neurolavalamp.com";
+
+                if (config == null)
+                    return "https://api.neurolavalamp.com";
+
+                switch (config.SelectedServerType)
+                {
+                    case LavaLampServerTypeOptions.TestServer:
+                        return "https://test.neurolavalamp.com";
+
+                    case LavaLampServerTypeOptions.CustomServer:
+                        // use regular server if text box empty
+                        return !string.IsNullOrWhiteSpace(config.CustomServerUrl)
+                            ? config.CustomServerUrl
+                            : "https://api.neurolavalamp.com";
+
+                    case LavaLampServerTypeOptions.RegularServer:
+                    default:
+                        return "https://api.neurolavalamp.com";
+                }
             }
         }
 

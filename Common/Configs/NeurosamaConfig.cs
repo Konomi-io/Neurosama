@@ -3,7 +3,14 @@ using Terraria.ModLoader.Config;
 
 namespace Neurosama.Common.Configs
 {
-	public class NeurosamaConfig : ModConfig
+    public enum LavaLampServerTypeOptions
+    {
+        TestServer,
+        RegularServer,
+        CustomServer
+    }
+    
+    public class NeurosamaConfig : ModConfig
 	{
 		// ConfigScope.ClientSide should be used for client side, usually visual or audio tweaks.
 		public override ConfigScope Mode => ConfigScope.ClientSide;
@@ -28,8 +35,13 @@ namespace Neurosama.Common.Configs
         public bool DisplayNowPlaying;
 
         [Header("LavaLamp")]
-        [DefaultValue(false)]
-        public bool UseTestServer;
+
+        [DefaultValue(LavaLampServerTypeOptions.RegularServer)]
+        public LavaLampServerTypeOptions SelectedServerType { get; set; }
+
+        [DefaultValue("https://api.neurolavalamp.com")]
+        public string CustomServerUrl { get; set; }
+
         [DefaultValue(false)]
         public bool UseDiscoColorWhenNoNeuroStream;
 

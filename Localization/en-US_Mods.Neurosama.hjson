@@ -388,14 +388,38 @@ Configs: {
 			Tooltip: Toggle "Now Playing:" messages in chat while listening to radio music boxes
 		}
 
-		UseTestServer: {
-			Label: Use Test Server
-			Tooltip: Test your lava lamp sync outside of streams (Debug)
-		}
-
 		UseDiscoColorWhenNoNeuroStream: {
 			Label: Use Disco Color When Stream Is Offline
 			Tooltip: Uses rainbow brick color pattern while Neuro's stream (and therefore lavalamp) is offline
+		}
+
+		SelectedServerType: {
+			Label: API Server Type
+			Tooltip: Choose your lava lamp API server
+		}
+
+		CustomServerUrl: {
+			Label: Custom Server Url
+			Tooltip: If custom server is selected, type the link here
+		}
+	}
+
+	LavaLampServerTypeOptions: {
+		Tooltip: ""
+
+		TestServer: {
+			Label: Test Server
+			Tooltip: Randomly changes to different colors, randomly toggles online and offline
+		}
+
+		RegularServer: {
+			Label: Regular Server
+			Tooltip: Syncs with Neuro's on-stream lava lamp
+		}
+
+		CustomServer: {
+			Label: Custom Server
+			Tooltip: Use your own custom server below
 		}
 	}
 }
