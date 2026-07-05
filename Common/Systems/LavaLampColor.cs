@@ -201,7 +201,7 @@ namespace Neurosama.Content
 
             try
             {
-                ModContent.GetInstance<Neurosama>().Logger.Debug($"SSE Stream Connecting: {uri.AbsoluteUri}");
+                ModContent.GetInstance<Neurosama>().Logger.Debug($"LavaLamp SSE Stream Connecting: {uri.AbsoluteUri}");
                 await client.ConnectAsync(uri.Host, 443, token);
 
                 using var sslStream = new SslStream(client.GetStream(), false);
@@ -296,7 +296,7 @@ namespace Neurosama.Content
             }
             catch
             {
-                // Suppress background drops silently
+                ModContent.GetInstance<Neurosama>().Logger.Debug("LavaLamp SSE Stream background drop.");
             }
             finally
             {

@@ -219,7 +219,7 @@ namespace Neurosama
 
                         if (samplesRead == 0)
                         {
-                            ModContent.GetInstance<Neurosama>().Logger.Warn("Stream reached EOF. Stream stopping.");
+                            ModContent.GetInstance<Neurosama>().Logger.Warn("Audio stream reached EOF. Stream stopping.");
                             break;
                         }
 
@@ -255,14 +255,17 @@ namespace Neurosama
             {
                 return;
             }
-            catch (OperationCanceledException) { }
+            catch (OperationCanceledException)
+            {
+                ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream disconnected.");
+            }
             catch (HttpRequestException ex) when (ex.InnerException is System.Net.Sockets.SocketException socketEx && socketEx.ErrorCode == 11001)
             {
-                ModContent.GetInstance<Neurosama>().Logger.Debug("Failed to connect to audio stream host. Skipping stream.");
+                ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream failed to connect to host. Skipping stream.");
             }
             catch (Exception ex)
             {
-                ModContent.GetInstance<Neurosama>().Logger.Error("Audio Stream Error: ", ex);
+                ModContent.GetInstance<Neurosama>().Logger.Error("Audio stream Error: ", ex);
             }
             finally
             {
@@ -271,19 +274,28 @@ namespace Neurosama
                 {
                     response?.Content?.Dispose();
                 }
-                catch { }
+                catch
+                {
+                    ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream content dispose failed.");
+                }
 
                 try
                 {
                     request?.Dispose();
                 }
-                catch { }
+                catch 
+                { 
+                    ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream request dispose failed.");
+                }
 
                 try
                 {
                     response?.Dispose();
                 }
-                catch { }
+                catch
+                {
+                    ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream response dispose failed.");
+                }
             }
         }
 
@@ -327,7 +339,10 @@ namespace Neurosama
 
                 if (_soundInstance.State != SoundState.Playing && _audioBufferQueue.Count >= PreBufferTargetCount)
                 {
-                    try { _soundInstance.Play(); } catch { }
+                    try { _soundInstance.Play(); } catch 
+                    { 
+                        ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream failed to resume audio instance playback."); 
+                    }
                 }
 
                 if (_soundInstance.State != SoundState.Playing)
@@ -380,7 +395,10 @@ namespace Neurosama
                                 instanceToDispose.Dispose();
                             }
                         }
-                        catch { }
+                        catch 
+                        { 
+                            ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream failed to dispose audio instance."); 
+                        }
                     });
                 }
             }
