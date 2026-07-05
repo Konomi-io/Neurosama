@@ -17,6 +17,7 @@ namespace Neurosama.Common
             public string RawPrefixFormat { get; set; }
             public string SongNameColor { get; set; }
             public string DashAndParenthesesColor { get; set; }
+            public bool ColorKaraokeSingerName { get; set; } = false;
             public string LastChattedSong { get; set; } = "";
         }
 
@@ -32,6 +33,7 @@ namespace Neurosama.Common
                     StreamUrl = "https://radio.twinskaraoke.com/listen/neuro_21/radio.mp3",
                     MusicAssetPath = "Assets/Music/silenceNeuro21",
                     VolumeMultiplier = 1f,
+                    ColorKaraokeSingerName = true,
                     SongNameColor = "C5B3E0",
                     DashAndParenthesesColor = "FFFFFF",
                     RawPrefixFormat = $"[c/9D5CFF:[]" +
@@ -47,6 +49,7 @@ namespace Neurosama.Common
                     StreamUrl = "https://live.truckers.fm/",
                     MusicAssetPath = "Assets/Music/silenceTruckersFM",
                     VolumeMultiplier = 0.5f, //truckersfm is loud lol
+                    ColorKaraokeSingerName = false,
                     SongNameColor = "D9D9D9",
                     DashAndParenthesesColor = "F316B0",
                     RawPrefixFormat = $"[c/F316B0:[]" +
@@ -116,7 +119,7 @@ namespace Neurosama.Common
                             string songDetails = "";
 
                             // unofficial Karaoke/Covers (Neuroverse only)
-                            if (parenStart >= 0 && title.EndsWith(")") && !Regex.IsMatch(originalArtist, @"neuro|vedal|evil", RegexOptions.IgnoreCase))
+                            if (parenStart >= 0 && title.EndsWith(")") && !Regex.IsMatch(originalArtist, @"neuro|vedal|evil", RegexOptions.IgnoreCase) && station.ColorKaraokeSingerName)
                             {
                                 string titlePart = title[..parenStart].TrimEnd();
                                 string karaokeArtists = title[(parenStart + 1)..^1];
