@@ -6,6 +6,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Utilities;
+using Neurosama.Common.Configs;
 
 namespace Neurosama.Content.NPCs
 {
@@ -73,6 +74,12 @@ namespace Neurosama.Content.NPCs
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
+            // disable spawns config
+            if (!ModContent.GetInstance<NeurosamaServerConfig>().ErmphibianSpawns)
+            {
+                return 0f; // Completely disables the spawn
+            }
+
             return SpawnCondition.Ocean.Chance * 0.09975f; // 399/400 * 0.1f
         }
 

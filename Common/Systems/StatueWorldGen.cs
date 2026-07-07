@@ -4,6 +4,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 using Terraria.WorldBuilding;
+using Neurosama.Common.Configs;
 
 namespace Neurosama.Common.Systems
 {
@@ -18,6 +19,12 @@ namespace Neurosama.Common.Systems
         private void On_WorldGen_SetupStatueList(On_WorldGen.orig_SetupStatueList orig)
         {
             orig();
+
+            // config check
+            if (!ModContent.GetInstance<NeurosamaServerConfig>().StatueGeneration)
+            {
+                return;
+            }
 
             int startIndex = GenVars.statueList.Length;
 

@@ -354,4 +354,19 @@ Configs: {
 			Tooltip: Toggle whether Neuro & Evil say voicelines when using certain emotes
 		}
 	}
+
+	NeurosamaServerConfig: {
+		StatueGeneration: {
+			Tooltip: Toggles Ermphibian statues in world generation
+			Label: Ermphibian Statue Generation
+		}
+
+		ErmphibianSpawns: {
+			Tooltip: Toggles spawning of Ermfish, Golden Ermfish, and Ermsharks
+			Label: Ermphibian Spawns
+		}
+
+		Headers.Ermphibians: Ermphibians
+		DisplayName: Neuro-sama Mod Server Config
+	}
 }

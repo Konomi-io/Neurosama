@@ -11,6 +11,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Utilities;
 using Terraria.Utilities.Terraria.Utilities;
+using Neurosama.Common.Configs;
 
 namespace Neurosama.Content.NPCs
 {
@@ -84,6 +85,12 @@ namespace Neurosama.Content.NPCs
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
+            // disable spawns config
+            if (!ModContent.GetInstance<NeurosamaServerConfig>().ErmphibianSpawns)
+            {
+                return 0f; // Completely disables the spawn
+            }
+
             return SpawnCondition.OceanMonster.Chance * 0.02f;
         }
 
