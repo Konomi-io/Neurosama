@@ -172,7 +172,29 @@ Items: {
 
 	LavaLamp: {
 		DisplayName: Neuro Lava Lamp
-		Tooltip: "'NEUROSAMA BRANDED ?!'"
+		Tooltip:
+			'''
+			'NEUROSAMA BRANDED ?!'
+			Syncs to stream when connected to the internet
+			'''
+	}
+
+	Neuro21MusicBox: {
+		DisplayName: Music Box (Neuro 21 Station)
+		Tooltip:
+			'''
+			'A dedicated radio broadcasting all Neuro and Evil karaoke covers 24/7.'
+			Requires internet connection
+			'''
+	}
+
+	TruckersFMMusicBox: {
+		DisplayName: Music Box (TruckersFM)
+		Tooltip:
+			'''
+			'I love TruckersFM'
+			Requires internet connection
+			'''
 	}
 }
 
@@ -333,11 +355,17 @@ Emotes: {
 }
 
 UI.ToggleOutfit: Toggle Outfit
+NowPlaying: Now Playing:
 
 Configs: {
 	NeurosamaConfig: {
 		DisplayName: Neuro-sama Mod Client Config
-		Headers.Audio: Audio
+
+		Headers: {
+			Audio: Audio
+			LiveRadio: Live Radio
+			LavaLamp: Lava Lamp
+		}
 
 		EmoteSoundsVolume: {
 			Label: Emote Sound Volume
@@ -353,5 +381,72 @@ Configs: {
 			Label: Emote Voiceline Sounds
 			Tooltip: Toggle whether Neuro & Evil say voicelines when using certain emotes
 		}
+
+		KeepStreamingUnfocused: {
+			Label: Keep Streaming Unfocused
+			Tooltip: Keeps music box radio streams running when out of tab
+		}
+
+		DisplayNowPlaying: {
+			Label: Display "Now Playing:" Message
+			Tooltip: Toggle "Now Playing:" messages in chat while listening to radio music boxes
+		}
+
+		UseDiscoColorWhenNoNeuroStream: {
+			Label: Use Disco Color When Stream Is Offline
+			Tooltip: Uses rainbow brick color pattern while Neuro's stream (and therefore lavalamp) is offline
+		}
+
+		SelectedServerType: {
+			Label: API Server Type
+			Tooltip: Choose your lava lamp API server
+		}
+
+		CustomServerUrl: {
+			Label: Custom Server Url
+			Tooltip: If custom server is selected, type the link here
+		}
+
+		LavaLampLiveLatency: {
+			Label: Lava Lamp Live Latency (ms)
+			Tooltip: How often to update lava lamp colors when Neuro is live
+		}
+
+		LavaLampOfflineLatency: {
+			Label: Lava Lamp Offline Latency (ms)
+			Tooltip: How often to check that Neuro is live
+		}
+
+		StreamSync: {
+			Label: Stream Sync
+			Tooltip: Toggle syncing lava lamp to Neuro's stream (no sync will default to rainbow brick color pattern)
+		}
 	}
+
+	LavaLampServerTypeOptions: {
+		Tooltip: ""
+
+		TestServer: {
+			Label: Test Server
+			Tooltip: Randomly changes to different colors, randomly toggles online and offline
+		}
+
+		MainServer: {
+			Label: Main Server
+			Tooltip: Syncs with Neuro's on-stream lava lamp
+		}
+
+		CustomServer: {
+			Label: Custom Server
+			Tooltip: Use your own custom server below
+		}
+	}
+}
+
+Conditions.VedalPresent: Mods.Neurosama.Conditions.VedalPresent
+
+NPCConditions: {
+	VedalPresent: Mods.Neurosama.NPCConditions.VedalPresent
+	NeuroPresent: Mods.Neurosama.NPCConditions.NeuroPresent
+	EvilPresent: Mods.Neurosama.NPCConditions.EvilPresent
 }

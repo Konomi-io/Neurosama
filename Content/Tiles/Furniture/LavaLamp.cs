@@ -6,6 +6,7 @@ using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
+using Terraria.DataStructures;
 
 namespace Neurosama.Content.Tiles.Furniture
 {
@@ -26,8 +27,7 @@ namespace Neurosama.Content.Tiles.Furniture
 
             TileObjectData.addTile(Type);
 
-            // Reuse the item localization for the map entry
-            AddMapEntry(new Color(253, 32, 3), ModContent.GetInstance<Items.Furniture.LavaLamp>().DisplayName);
+            AddMapEntry(new Color(182, 177, 178), ModContent.GetInstance<Items.Furniture.LavaLamp>().DisplayName);
 
             glowTexture = ModContent.Request<Texture2D>(Texture + "_Glow");
         }
@@ -39,7 +39,7 @@ namespace Neurosama.Content.Tiles.Furniture
 
         public override void AnimateTile(ref int frame, ref int frameCounter)
         {
-            if (++frameCounter >= 8)
+            if (++frameCounter >= 12)
             {
                 frameCounter = 0;
                 frame = ++frame % 7;
@@ -60,7 +60,8 @@ namespace Neurosama.Content.Tiles.Furniture
                 return;
             }
 
-            Color color = Main.DiscoColor;
+            //Color color = Main.DiscoColor;
+            Color color = LavaLampColor.CurrentColor;
             color.A = 0;
 
             Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
@@ -81,13 +82,25 @@ namespace Neurosama.Content.Tiles.Furniture
             spriteBatch.Draw(glowTexture.Value, new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y + offsetY) + zero, drawRectangle, color, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
 
+        public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+        {
+            LavaLampColor.MarkLampAsVisible();
+        }
+        
         public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
         {
             const float factor = 100f / (255f * 255f);
 
+            /*
             r = Main.DiscoColor.R * factor;
             g = Main.DiscoColor.G * factor;
             b = Main.DiscoColor.B * factor;
+            */
+            // Grab the color directly from the global system!
+            Color color = LavaLampColor.CurrentColor;
+            r = color.R * factor;
+            g = color.G * factor;
+            b = color.B * factor;
         }
     }
 }

@@ -23,7 +23,8 @@ namespace Neurosama.Content.Items.Furniture
             Item.width = 32;
             Item.height = 32;
             Item.rare = ItemRarityID.Cyan;
-            Item.value = Item.buyPrice(0, 2);
+            // only 64.99!
+            Item.value = Item.buyPrice(0, 0, 64, 99);
         }
 
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
