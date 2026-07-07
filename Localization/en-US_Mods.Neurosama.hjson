@@ -357,12 +357,12 @@ Configs: {
 
 	NeurosamaServerConfig: {
 		StatueGeneration: {
-			Tooltip: "Toggles Ermphibian statues in world generation"
+			Tooltip: Toggles Ermphibian statues in world generation
 			Label: Ermphibian Statue Generation
 		}
 
 		ErmphibianSpawns: {
-			Tooltip: "Toggles spawning of Ermfish, Golden Ermfish, and Ermsharks"
+			Tooltip: Toggles spawning of Ermfish, Golden Ermfish, and Ermsharks
 			Label: Ermphibian Spawns
 		}
 
