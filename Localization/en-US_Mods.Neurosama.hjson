@@ -443,10 +443,8 @@ Configs: {
 	}
 }
 
-Conditions.VedalPresent: Mods.Neurosama.Conditions.VedalPresent
-
 NPCConditions: {
-	VedalPresent: Mods.Neurosama.NPCConditions.VedalPresent
-	NeuroPresent: Mods.Neurosama.NPCConditions.NeuroPresent
-	EvilPresent: Mods.Neurosama.NPCConditions.EvilPresent
+	VedalPresent: Vedal is present
+	NeuroPresent: Neuro is Present
+	EvilPresent: Evil is Present
 }
