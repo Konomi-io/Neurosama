@@ -277,6 +277,7 @@ namespace Neurosama.Content.NPCs.Town
                 .Add<Items.Donobrick>()
                 .Add<NeuroMusicBox>()
                 .Add<NeverMusicBox>()
+                .Add<ColorfulArrayMusicBox>()
                 //.Add<Items.SwarmPet>()
                 .Add<Items.Armor.NeuroVanityStockings>()
                 .Add<Items.Armor.NeuroVanityUniform>()
@@ -330,6 +331,8 @@ namespace Neurosama.Content.NPCs.Town
         }*/
 
         public override int? PickEmote(Player closestPlayer, List<int> emoteList, WorldUIAnchor otherAnchor) {
+            emoteList.Add(ModContent.EmoteBubbleType<NeurizzEmote>());
+
             emoteList.Add(ModContent.EmoteBubbleType<ErmEmote>());
 
             emoteList.Add(ModContent.EmoteBubbleType<HeartEmote>());

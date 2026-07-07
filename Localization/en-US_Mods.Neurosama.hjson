@@ -21,6 +21,11 @@ Items: {
 		Tooltip: ""
 	}
 
+	ColorfulArrayMusicBox: {
+		DisplayName: Music Box (Colorful Array)
+		Tooltip: ""
+	}
+
 	NeuroCatErm: {
 		DisplayName: neuroErm
 		Tooltip: "'The epitome of aesthetic splendor that will forever enchant your gaze'"
@@ -162,12 +167,12 @@ Items: {
 
 	VedalFumo: {
 		DisplayName: Vedal Plush
-		Tooltip: ""
+		Tooltip: "'May be delivered in pancake form'"
 	}
 
 	LavaLamp: {
 		DisplayName: Neuro Lava Lamp
-		Tooltip: ""
+		Tooltip: "'NEUROSAMA BRANDED ?!'"
 	}
 }
 
@@ -295,6 +300,7 @@ Dialogue: {
 		StandardDialogue7: Hey Ladies! My name is Vedal. I run a few Twitch channels and am an overall tech wizard. I would best describe myself as a bald beautiful girl. Chat insults me a lot and says I'm washed-up. Prove them wrong by messaging me.
 		StandardDialogue8: Am I pregnant?
 		StandardDialogue9: I would like the womb tattoo. I am begging, I am on my hands and knees, send me the womb tattoo.
+		StandardDialogue10: Catgirls catgirls catgirls catgirls catgirls catgirls catgirls catgirls Catgirls Catgirls CATGIRLS CATGIRLS CATGIRLS!
 	}
 }
 
@@ -322,6 +328,8 @@ Emotes: {
 	ErmEmote.Command: erm
 	TutelEmote.Command: tutel
 	FrickEmote.Command: frick
+	PipesEmote.Command: pipes
+	NeurizzEmote.Command: neurizz
 }
 
 UI.ToggleOutfit: Toggle Outfit
@@ -331,9 +339,19 @@ Configs: {
 		DisplayName: Neuro-sama Mod Client Config
 		Headers.Audio: Audio
 
-		EmoteSoundsToggle: {
-			Label: Emote Sounds
-			Tooltip: "Toggle Neuro & Evil making sounds when using certain emotes"
+		EmoteSoundsVolume: {
+			Label: Emote Sound Volume
+			Tooltip: Adjust volume of the sounds Neuro & Evil make when using certain emotes
+		}
+
+		EmoteSFXToggle: {
+			Label: Emote Soundboard Sounds
+			Tooltip: Toggle whether Neuro & Evil play soundboard sounds when using certain emotes
+		}
+
+		EmoteVoiceToggle: {
+			Label: Emote Voiceline Sounds
+			Tooltip: Toggle whether Neuro & Evil say voicelines when using certain emotes
 		}
 	}
 }

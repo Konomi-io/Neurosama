@@ -128,6 +128,7 @@ namespace Neurosama.Content.NPCs.Town
             chat.Add(Language.GetTextValue("Mods.Neurosama.Dialogue.Vedal.StandardDialogue7"));
             chat.Add(Language.GetTextValue("Mods.Neurosama.Dialogue.Vedal.StandardDialogue8"));
             chat.Add(Language.GetTextValue("Mods.Neurosama.Dialogue.Vedal.StandardDialogue9"));
+            chat.Add(Language.GetTextValue("Mods.Neurosama.Dialogue.Vedal.StandardDialogue10"));
 
             return chat;
         }

@@ -15,6 +15,7 @@ namespace Neurosama.Content.Tiles
         {
             Main.tileFrameImportant[Type] = true;
             Main.tileObsidianKill[Type] = true;
+            Main.tileSpelunker[Type] = true;
             TileID.Sets.DisableSmartCursor[Type] = true;
             TileID.Sets.IsAMechanism[Type] = true; // Ensures that this tile and connected pressure plate won't be removed during the "Remove Broken Traps" worldgen step
 
