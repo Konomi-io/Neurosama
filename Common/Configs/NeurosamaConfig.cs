@@ -49,7 +49,7 @@ namespace Neurosama.Common.Configs
         public bool StreamSync { get; set; }
 
         [Range(100, 1000)]
-        [Increment(100)]
+        [Increment(50)]
         [DefaultValue(500)]
         public int LavaLampLiveLatency { get; set; }
 

@@ -182,14 +182,14 @@ namespace Neurosama.Content
 
                 if (!IsLavaLampOnScreen)
                 {
-                    await Task.Delay(config.LavaLampLiveLatency, token);
+                    await Task.Delay(Math.Max(config.LavaLampLiveLatency, 100), token);
                     continue;
                 }
 
                 if (!IsApiConnected)
                 {
                     HandleFallbackTransition();
-                    await Task.Delay(config.LavaLampLiveLatency, token);
+                    await Task.Delay(Math.Max(config.LavaLampOfflineLatency, 1000), token);
                     continue;
                 }
 
@@ -201,7 +201,7 @@ namespace Neurosama.Content
                     liveSnapshot = _isLive;
                 }
 
-                int delayMs = _useDiscoFallback ? 5000 : (liveSnapshot ? config.LavaLampLiveLatency : config.LavaLampOfflineLatency);
+                int delayMs = _useDiscoFallback ? 5000 : (liveSnapshot ? Math.Max(config.LavaLampLiveLatency, 100) : Math.Max(config.LavaLampOfflineLatency, 1000));
                 try
                 {
                     await Task.Delay(delayMs, token);
