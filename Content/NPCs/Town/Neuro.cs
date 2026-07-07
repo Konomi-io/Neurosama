@@ -277,6 +277,7 @@ namespace Neurosama.Content.NPCs.Town
                 .Add<Items.Donobrick>()
                 .Add<NeuroMusicBox>()
                 .Add<NeverMusicBox>()
+                .Add<ColorfulArrayMusicBox>()
                 //.Add<Items.SwarmPet>()
                 .Add<Items.Armor.NeuroVanityStockings>()
                 .Add<Items.Armor.NeuroVanityUniform>()

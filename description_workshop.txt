@@ -3,13 +3,13 @@ This is a fan made mod for the Twitch streamer Neuro-sama and her sister Evil Ne
 
 The mod is still in beta-like state, so there are a few unfinished features and unsquashed bugs. If you find any, you can report them in the Discord thread or by creating an issue on Github.
 
-Anyone is welcome to contribute to the mod! If you would like to participate in the discussion, join the Neuro-sama Discord and click the link to the mod’s thread below.
+Anyone is welcome to contribute to the mod! If you would like to participate in the discussion, join the Neuro-sama Discord and click the link to the mod's thread below.
 
 [h2]Current Features[/h2]
 [list][*] Neuro, Evil and Vedal NPCs
 [*] All 3 official plushes
 [*] Ermfish critter and Ermshark enemy
-[*] Vanity for Neuro and Evil’s outfits
+[*] Vanity for Neuro and Evil's outfits
 [*] Abandoned Archive (Corpa)
 [*] Music boxes for all the Neuro & Evil originals
 [*] neuroErm
@@ -37,7 +37,7 @@ Anyone is welcome to contribute to the mod! If you would like to participate in 
 [*] Vedal (Creator of Neuro-sama and Abandoned Archive)
 [/list]
 [h1]Links[/h1]
-[b][url=https://github.com/K0nomi/Neurosama]Source Code[/url]
+[b][url=https://github.com/Konomi-io/Neurosama]Source Code[/url]
 [url=https://twitch.tv/vedal987]Neuro-sama on Twitch[/url]
 [url=https://discord.gg/neurosama]Neuro-sama Discord[/url]
 [url=https://discord.com/channels/574720535888396288/1445858406090018836]Discord Thread for Mod Discussion[/url]

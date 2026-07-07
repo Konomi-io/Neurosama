@@ -10,7 +10,7 @@ Anyone is welcome to contribute to the mod! If you would like to participate in 
 - Neuro, Evil and Vedal NPCs
 - All 3 official plushes
 - Ermfish critter and Ermshark enemy
-- Vanity for Neuro and Evil’s outfits
+- Vanity for Neuro and Evil's outfits
 - Abandoned Archive (Corpa)
 - Music boxes for all the Neuro & Evil originals
 - neuroErm

@@ -6,7 +6,7 @@ This is a fan made mod for the Twitch streamer Neuro-sama and her sister Evil Ne
 - Neuro, Evil and Vedal NPCs
 - All 3 official plushes
 - Ermfish critter and Ermshark enemy
-- Vanity for Neuro and Evil’s outfits
+- Vanity for Neuro and Evil's outfits
 - Abandoned Archive (Corpa)
 - Music boxes for all the Neuro & Evil originals
 - neuroErm
@@ -30,6 +30,9 @@ Check the mod's homepage for links and the source code!
 
 
 =~= Changelog =~=
+
+v0.3.1
+- Neuro actaully sells the Colourful Array music box now
 
 v0.3
 - Added 2 more toggles to the neuro twins (and their shimmer variants)
