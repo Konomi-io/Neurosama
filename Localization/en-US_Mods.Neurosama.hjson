@@ -174,8 +174,8 @@ Items: {
 		DisplayName: Neuro Lava Lamp
 		Tooltip:
 			'''
-			'NEUROSAMA BRANDED?!'
-			Requires internet connection
+			'NEUROSAMA BRANDED ?!'
+			Syncs to stream when connected to internet
 			'''
 	}
 
