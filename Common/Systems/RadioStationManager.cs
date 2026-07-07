@@ -16,7 +16,7 @@ namespace Neurosama.Common
             public float VolumeMultiplier { get; set; } = 1f;
             public string RawPrefixFormat { get; set; }
             public string SongNameColor { get; set; }
-            public string DashAndParenthesesColor { get; set; }
+            public string DashAmpersandParenthesesColor { get; set; }
             public bool ColorKaraokeSingerName { get; set; } = false;
             public string LastChattedSong { get; set; } = "";
         }
@@ -26,7 +26,7 @@ namespace Neurosama.Common
         public override void Load()
         {
             if (Main.dedServ) return;
-            
+
             _stations = new List<RadioStations>
             {
                 new RadioStations
@@ -37,7 +37,7 @@ namespace Neurosama.Common
                     VolumeMultiplier = 1f,
                     ColorKaraokeSingerName = true,
                     SongNameColor = "C5B3E0",
-                    DashAndParenthesesColor = "FFFFFF",
+                    DashAmpersandParenthesesColor = "FFFFFF",
                     RawPrefixFormat = $"[c/9D5CFF:[]" +
                                       $"[c/CE64CE:N][c/D364C9:e][c/D965C3:u][c/DE66BE:r][c/E467B8:o] " +
                                       $"[c/EF69AD:2][c/F469A8:1] " +
@@ -53,7 +53,7 @@ namespace Neurosama.Common
                     VolumeMultiplier = 0.5f, //truckersfm is loud lol
                     ColorKaraokeSingerName = false,
                     SongNameColor = "D9D9D9",
-                    DashAndParenthesesColor = "F316B0",
+                    DashAmpersandParenthesesColor = "F316B0",
                     RawPrefixFormat = $"[c/F316B0:[]" +
                                       $"[c/D9D9D9:truckers]" +
                                       $"[c/F316B0:.]" +
@@ -99,6 +99,7 @@ namespace Neurosama.Common
                         channel.Volume = Main.musicVolume * currentTrackFade * station.VolumeMultiplier;
 
                         string incomingTitle = channel.CurrentSongTitle;
+                        //incomingTitle = "name - song (Neuro & Evil)"; //testing
 
                         if (!string.IsNullOrEmpty(incomingTitle) && station.LastChattedSong != incomingTitle && ModContent.GetInstance<Common.Configs.NeurosamaConfig>().DisplayNowPlaying)
                         {
@@ -133,20 +134,20 @@ namespace Neurosama.Common
                                 for (int i = 0; i < parts.Length; i++)
                                 {
                                     if (i > 0)
-                                        coloredArtists += $" [c/{station.SongNameColor}:&] ";
+                                        coloredArtists += $" [c/{station.DashAmpersandParenthesesColor}:&] ";
 
                                     string karaokeArtist = parts[i].Trim();
                                     coloredArtists += GetColoredArtist(karaokeArtist, station.SongNameColor);
                                 }
 
-                                songDetails = $"{coloredOriginalArtists} [c/{station.DashAndParenthesesColor}:-] [c/{station.SongNameColor}:{titlePart}] [c/{station.DashAndParenthesesColor}:(]{coloredArtists}[c/{station.DashAndParenthesesColor}:)]";
+                                songDetails = $"{coloredOriginalArtists} [c/{station.DashAmpersandParenthesesColor}:-] [c/{station.SongNameColor}:{titlePart}] [c/{station.DashAmpersandParenthesesColor}:(]{coloredArtists}[c/{station.DashAmpersandParenthesesColor}:)]";
                             }
                             else
                             {
                                 //official songs/covers
                                 if (firstDash >= 0)
                                 {
-                                    songDetails = $"{coloredOriginalArtists} [c/{station.DashAndParenthesesColor}:-] [c/{station.SongNameColor}:{title}]";
+                                    songDetails = $"{coloredOriginalArtists} [c/{station.DashAmpersandParenthesesColor}:-] [c/{station.SongNameColor}:{title}]";
                                 }
                                 //no dashes?
                                 else
