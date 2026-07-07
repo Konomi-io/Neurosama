@@ -87,12 +87,16 @@ namespace Neurosama
         private DynamicSoundEffectInstance _soundInstance;
         private CancellationTokenSource _cts;
         private readonly ConcurrentQueue<byte[]> _audioBufferQueue = new ConcurrentQueue<byte[]>();
+        private HttpRequestMessage _currentRequest;
+        private HttpResponseMessage _currentResponse;
+        private Stream _currentNetworkStream;
 
         private const int PreBufferTargetCount = 15;
         private const int MaxQueueCapacity = PreBufferTargetCount + 15;
 
         private bool _wasUnfocused = false;
         private bool _stopRequested = false;
+        private bool _isDisposingFromUnload = false;
         private readonly object _instanceLock = new object();
 
         public Mp3StreamChannel(HttpClient sharedClient)
@@ -130,6 +134,7 @@ namespace Neurosama
             Url = url;
             IsStreaming = true;
             _stopRequested = false;
+            _isDisposingFromUnload = false;
 
             while (_audioBufferQueue.TryDequeue(out _)) ;
             _cts = new CancellationTokenSource();
@@ -139,34 +144,32 @@ namespace Neurosama
 
         private async Task StreamLoop(string url, CancellationToken token)
         {
-            // Scope these at the top so the finally block can see them to kill the socket
-            HttpRequestMessage request = null;
-            HttpResponseMessage response = null;
-            DynamicSoundEffectInstance localInstance = null;
-
             try
             {
-                request = new HttpRequestMessage(HttpMethod.Get, url);
-                request.Headers.Add("Icy-MetaData", "1");
-                request.Headers.UserAgent.ParseAdd($"NeurosamaTerrariaMod/{ModContent.GetInstance<Neurosama>().Version}");
+                if (token.IsCancellationRequested || _isDisposingFromUnload) return;
 
-                // Force native teardown on close
-                request.Headers.ConnectionClose = true;
+                _currentRequest = new HttpRequestMessage(HttpMethod.Get, url);
+                _currentRequest.Headers.Add("Icy-MetaData", "1");
+                _currentRequest.Headers.UserAgent.ParseAdd($"NeurosamaTerrariaMod/{ModContent.GetInstance<Neurosama>().Version}");
+                _currentRequest.Headers.ConnectionClose = true;
 
                 // Use a linked timeout specifically for the handshake phase
                 using var handshakeCts = CancellationTokenSource.CreateLinkedTokenSource(token);
                 handshakeCts.CancelAfter(TimeSpan.FromSeconds(6));
 
-                response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, handshakeCts.Token);
-                response.EnsureSuccessStatusCode();
+                _currentResponse = await _httpClient.SendAsync(_currentRequest, HttpCompletionOption.ResponseHeadersRead, handshakeCts.Token);
+                _currentResponse.EnsureSuccessStatusCode();
+
+                if (token.IsCancellationRequested || _isDisposingFromUnload) return;
 
                 int metaInt = 0;
-                if (response.Headers.TryGetValues("icy-metaint", out var values))
+                if (_currentResponse.Headers.TryGetValues("icy-metaint", out var values))
                 {
                     int.TryParse(System.Linq.Enumerable.FirstOrDefault(values), out metaInt);
                 }
 
-                Stream rawNetStream = await response.Content.ReadAsStreamAsync(token);
+                _currentNetworkStream = await _currentResponse.Content.ReadAsStreamAsync(token);
+                Stream rawNetStream = _currentNetworkStream;
 
                 if (metaInt > 0)
                 {
@@ -176,131 +179,114 @@ namespace Neurosama
                     });
                 }
 
-                using (rawNetStream)
-                using (var trackableStream = new PositionTrackingStream(rawNetStream))
-                using (var mpegStream = new MpegFile(trackableStream))
+                // Run decoding directly inline on the background thread using the raw network stream
+                try
                 {
-                    lock (_instanceLock)
-                    {
-                        if (token.IsCancellationRequested) return;
-
-                        _soundInstance = new DynamicSoundEffectInstance(mpegStream.SampleRate, (AudioChannels)mpegStream.Channels);
-                        localInstance = _soundInstance;
-                    }
-
-                    float[] sampleBuffer = new float[4096];
-                    byte[] pcmByteBuffer = new byte[sampleBuffer.Length * 2];
-                    bool hasStartedPlayback = false;
-
-                    while (!token.IsCancellationRequested)
-                    {
-                        bool keepAlive = ModContent.GetInstance<Common.Configs.NeurosamaConfig>().KeepStreamingUnfocused;
-                        if (!Main.instance.IsActive && !keepAlive)
-                        {
-                            _stopRequested = true;
-                            break;
-                        }
-
-                        if (_audioBufferQueue.Count >= MaxQueueCapacity)
-                        {
-                            await Task.Delay(40, token);
-                            continue;
-                        }
-
-                        int samplesRead = 0;
-                        try
-                        {
-                            samplesRead = await Task.Run(() => mpegStream.ReadSamples(sampleBuffer, 0, sampleBuffer.Length), token);
-                        }
-                        catch (IOException) when (token.IsCancellationRequested)
-                        {
-                            return;
-                        }
-
-                        if (samplesRead == 0)
-                        {
-                            ModContent.GetInstance<Neurosama>().Logger.Warn("Audio stream reached EOF. Stream stopping.");
-                            break;
-                        }
-
-                        for (int i = 0; i < samplesRead; i++)
-                        {
-                            short sample = (short)MathHelper.Clamp(sampleBuffer[i] * short.MaxValue, short.MinValue, short.MaxValue);
-                            pcmByteBuffer[i * 2] = (byte)(sample & 0xFF);
-                            pcmByteBuffer[i * 2 + 1] = (byte)((sample >> 8) & 0xFF);
-                        }
-
-                        byte[] cleanChunk = new byte[samplesRead * 2];
-                        Buffer.BlockCopy(pcmByteBuffer, 0, cleanChunk, 0, cleanChunk.Length);
-
-                        _audioBufferQueue.Enqueue(cleanChunk);
-
-                        if (!hasStartedPlayback && _audioBufferQueue.Count >= PreBufferTargetCount)
-                        {
-                            lock (_instanceLock)
-                            {
-                                if (_soundInstance != null && !_soundInstance.IsDisposed)
-                                {
-                                    _soundInstance.Play();
-                                    hasStartedPlayback = true;
-                                }
-                            }
-                        }
-
-                        await Task.Delay(5, token);
-                    }
+                    DecodeAudioEngine(rawNetStream, token);
+                }
+                catch (Exception)
+                {
+                    ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream decoding error.");
+                }
+                finally
+                {
+                    try { rawNetStream?.Dispose(); } catch { ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream failed to dispose raw network stream."); }
+                    try { _currentNetworkStream?.Dispose(); } catch { ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream failed to dispose network stream."); }
                 }
             }
-            catch (IOException) when (token.IsCancellationRequested)
+            catch
             {
-                return;
-            }
-            catch (OperationCanceledException)
-            {
-                ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream disconnected.");
-            }
-            catch (HttpRequestException ex) when (ex.InnerException is System.Net.Sockets.SocketException socketEx && socketEx.ErrorCode == 11001)
-            {
-                ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream failed to connect to host. Skipping stream.");
-            }
-            catch (Exception ex)
-            {
-                ModContent.GetInstance<Neurosama>().Logger.Error("Audio stream Error: ", ex);
+                ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream handshake error.");
             }
             finally
             {
-                _stopRequested = true;
-                try
+                CleanupNetworkResources();
+            }
+        }
+
+        private void DecodeAudioEngine(Stream sourceStream, CancellationToken token)
+        {
+            DynamicSoundEffectInstance localInstance = null;
+
+            using (var trackableStream = new PositionTrackingStream(sourceStream))
+            using (var mpegStream = new MpegFile(trackableStream))
+            {
+                lock (_instanceLock)
                 {
-                    response?.Content?.Dispose();
-                }
-                catch
-                {
-                    ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream content dispose failed.");
+                    if (token.IsCancellationRequested || _isDisposingFromUnload) return;
+
+                    _soundInstance = new DynamicSoundEffectInstance(mpegStream.SampleRate, (AudioChannels)mpegStream.Channels);
+                    localInstance = _soundInstance;
                 }
 
-                try
-                {
-                    request?.Dispose();
-                }
-                catch 
-                { 
-                    ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream request dispose failed.");
-                }
+                float[] sampleBuffer = new float[4096];
+                byte[] pcmByteBuffer = new byte[sampleBuffer.Length * 2];
+                bool hasStartedPlayback = false;
 
-                try
+                while (!token.IsCancellationRequested && !_isDisposingFromUnload)
                 {
-                    response?.Dispose();
-                }
-                catch
-                {
-                    ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream response dispose failed.");
+                    if (_audioBufferQueue.Count >= MaxQueueCapacity)
+                    {
+                        Thread.Sleep(40);
+                        continue;
+                    }
+
+                    int samplesRead = mpegStream.ReadSamples(sampleBuffer, 0, sampleBuffer.Length);
+                    if (samplesRead == 0 || token.IsCancellationRequested || _isDisposingFromUnload)
+                    {
+                        break;
+                    }
+
+                    for (int i = 0; i < samplesRead; i++)
+                    {
+                        short sample = (short)MathHelper.Clamp(sampleBuffer[i] * short.MaxValue, short.MinValue, short.MaxValue);
+                        pcmByteBuffer[i * 2] = (byte)(sample & 0xFF);
+                        pcmByteBuffer[i * 2 + 1] = (byte)((sample >> 8) & 0xFF);
+                    }
+
+                    byte[] cleanChunk = new byte[samplesRead * 2];
+                    Buffer.BlockCopy(pcmByteBuffer, 0, cleanChunk, 0, cleanChunk.Length);
+
+                    _audioBufferQueue.Enqueue(cleanChunk);
+
+                    if (!hasStartedPlayback && _audioBufferQueue.Count >= PreBufferTargetCount)
+                    {
+                        lock (_instanceLock)
+                        {
+                            if (_soundInstance != null && !_soundInstance.IsDisposed)
+                            {
+                                _soundInstance.Play();
+                                hasStartedPlayback = true;
+                            }
+                        }
+                    }
+
+                    Thread.Sleep(5);
                 }
             }
         }
 
+        private void CleanupNetworkResources()
+        {
+            _currentRequest = null;
+            _currentResponse = null;
+        }
+
+        public void DisposeFromUnload()
+        {
+            _isDisposingFromUnload = true;
+            try { _cts?.Cancel(); _cts?.Dispose(); } catch { ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream failed to cancel token."); }
+            CleanupNetworkResources();
+
+            _currentNetworkStream = null;
+            _currentRequest = null;
+            _currentResponse = null;
+        }
+
         public void PumpAudio()
         {
+            if (_isDisposingFromUnload) return;
+
             lock (_instanceLock)
             {
                 if (_soundInstance == null || _soundInstance.IsDisposed)
@@ -339,10 +325,7 @@ namespace Neurosama
 
                 if (_soundInstance.State != SoundState.Playing && _audioBufferQueue.Count >= PreBufferTargetCount)
                 {
-                    try { _soundInstance.Play(); } catch 
-                    { 
-                        ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream failed to resume audio instance playback."); 
-                    }
+                    try { _soundInstance.Play(); } catch { ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream failed to play."); }
                 }
 
                 if (_soundInstance.State != SoundState.Playing)
@@ -372,9 +355,13 @@ namespace Neurosama
 
         public void Stop()
         {
-            _cts?.Cancel();
+            _isDisposingFromUnload = true;
+            try { _cts?.Cancel(); } catch { ModContent.GetInstance<Neurosama>().Logger.Debug("Audio stream failed."); }
             IsStreaming = false;
             _stopRequested = false;
+
+            CleanupNetworkResources();
+            _currentNetworkStream = null;
 
             while (_audioBufferQueue.TryDequeue(out _)) ;
 
